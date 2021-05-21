@@ -24,20 +24,25 @@
 			let date = (new Date()).toLocaleString();
 			let totalShots = centers.length ? centers.map(c => c.sessions).flat().filter(s => s.min_age_limit==18).map(s => s.available_capacity).reduce((c1,c2) => c1+c2) : 0;
 
-			let msg = `${date} ==> ${centers.length} centers.`;
 			console.log(centers);
+			let responseDiv = document.createElement('div');
 			let audio = document.querySelector('audio');
 			if(centers.length) {
-				msg = `${date} ==> ${centers.length} centers: ${totalShots} doses.`;
 				if(audio.paused) audio.play();
+				responseDiv.innerHTML = `${date} ==> <strong>${centers.length}</strong> centers: <strong>${totalShots}</strong> doses. `;
+				let anchor = document.createElement('a');
+				anchor.href = 'https://selfregistration.cowin.gov.in/';
+				anchor.innerHTML = 'Book your slot NOW.';
+				anchor.target = '_blank';
+				responseDiv.appendChild(anchor);
 			} else {
 				audio.pause();
 				audio.currentTime = 0;
+				responseDiv.innerHTML = `${date} ==> 0 centers.`;
 			}
-			let nl = document.createElement('br');
-			let txt = document.createTextNode(`${msg}`);
-			document.querySelector('.availability-data').appendChild(nl);
-			document.querySelector('.availability-data').appendChild(txt);
+			let br = document.createElement('br');
+			document.querySelector('.availability-data').appendChild(br);
+			document.querySelector('.availability-data').appendChild(responseDiv);
 
 		}
 
@@ -55,6 +60,7 @@
 			let form = document.querySelector('form');
 			document.querySelector('body').removeChild(form);
 			document.querySelector('.title .interval').innerHTML = interval;
+			document.querySelector('.title .pincode').innerHTML = pincode;
 			processInfo(pincode);
 			let myInterval = setInterval(()=>processInfo(pincode), interval*60*1000);
 		}
@@ -78,7 +84,6 @@
 		}
 		.title {
 			margin: 20px;
-			text-align: center;
 		}
 		.availability-data {
 			margin-bottom: 10px;
@@ -93,7 +98,16 @@
 		<button class='init-button'>Start</button>
 		
 	</form>
-	<div class='title'>Checking for vaccination centers every <span class='interval'>5</span> minutes.<br/>Please play/pause the notification sound and adjust the system volume accordingly.<br/>Ensure that your system doesn't sleep/hibernate.</div>
+	<div class='title'>
+		Checking for vaccination centers every <span class='interval'>_</span> minutes for <span class='pincode'>______</span>.
+		<br/>
+		<h4>Note:</h4>
+		<ul>
+			<li>This tool works best on laptop/desktop.</li>
+			<li>Please play/pause the notification sound and adjust the system volume accordingly.</li>
+			<li>Ensure that your system doesn't sleep/hibernate.</li>
+		</ul>
+	</div>
 	<div class='availability-data'></div>
 	<div id='sound-alert'></div>
 	<audio autoplay loop controls>
