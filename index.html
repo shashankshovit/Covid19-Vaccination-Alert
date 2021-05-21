@@ -92,6 +92,9 @@
 </head>
 <body>
 	<form action="javascript:void(0)">
+		<h3>Purpose of this tool</h3>
+		<p>Currently there is a shortage of vaccines for 18+. This tool notifies you as soon as a vaccination center has vaccines available for <strong>18+</strong> for the given pincode. You can set the time interval for which this tool checks the availability of vaccine shots.</p>
+		<hr/>
 		<input type="text" class='pincode' placeholder="Pincode" pattern='^\d{6}$' title='Your 6 digit area pincode.' required />
 		<input type="number" class='interval' placeholder="Interval" value="5" min=1 max=60 title='Time interval in minutes.' required />
 		minutes
@@ -99,11 +102,11 @@
 		
 	</form>
 	<div class='title'>
-		Checking for vaccination centers every <span class='interval'>_</span> minutes for <span class='pincode'>______</span>.
+		Checking for vaccination centers every <strong><span class='interval'>_</span></strong> minutes for pincode <strong><span class='pincode'>______</span></strong> for 18+.
 		<br/>
 		<h4>Note:</h4>
 		<ul>
-			<li>This tool works best on laptop/desktop.</li>
+			<li>This tool works best on laptop/desktop. Mobile OS kills the browser tab, hence the script.</li>
 			<li>Please play/pause the notification sound and adjust the system volume accordingly.</li>
 			<li>Ensure that your system doesn't sleep/hibernate.</li>
 		</ul>
