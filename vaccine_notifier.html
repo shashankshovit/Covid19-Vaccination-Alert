@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Vaccine Availability</title>
+	<script type="text/javascript">
+		async function getCenters(pincode) {
+			let today = new Date();
+			let datestr = `${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()}`;
+			let url;
+			url = `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${pincode}&date=${datestr}`;
+			let res = await fetch(url);
+			res = await res.json();
+
+			return res.centers.filter(ctr => {
+			    if(ctr.sessions?.length) {
+			        return ctr.sessions.some(sn => sn.min_age_limit<45 && sn.available_capacity>0)
+			    } else
+			        return false;
+			});
+		}
+
+		let processInfo = async (pincode) => {
+			let centers = await getCenters(pincode);
+			let date = (new Date()).toLocaleString();
+			let totalShots = centers.length ? centers.map(c => c.sessions).flat().filter(s => s.min_age_limit==18).map(s => s.available_capacity).reduce((c1,c2) => c1+c2) : 0;
+
+			let msg = `${date} ==> ${centers.length} centers.`;
+			console.log(centers);
+			let audio = document.querySelector('audio');
+			if(centers.length) {
+				msg = `${date} ==> ${centers.length} centers: ${totalShots} doses.`;
+				if(audio.paused) audio.play();
+			} else {
+				audio.pause();
+				audio.currentTime = 0;
+			}
+			let nl = document.createElement('br');
+			let txt = document.createTextNode(`${msg}`);
+			document.querySelector('.availability-data').appendChild(nl);
+			document.querySelector('.availability-data').appendChild(txt);
+
+		}
+
+		let startChecking = (evt) => {
+			let pincode = document.querySelector('form input.pincode').value;
+			let interval = document.querySelector('form input.interval').value;
+			if(!pincode || !pincode.match(/^\d{6}$/)) {
+				alert('Invalid Pincode!');
+				return false;
+			}
+			if(!interval || interval<1) {
+				alert('Invalid Interval!');
+				return false;
+			}
+			let form = document.querySelector('form');
+			document.querySelector('body').removeChild(form);
+			document.querySelector('.title .interval').innerHTML = interval;
+			processInfo(pincode);
+			let myInterval = setInterval(()=>processInfo(pincode), interval*60*1000);
+		}
+
+		window.onload = function() {
+			document.querySelector('button.init-button').addEventListener('click', startChecking);
+		}
+
+	</script>
+
+	<style type="text/css">
+		div {
+			padding: 5px;
+		}
+		input {
+			width: 60px;
+		}
+		button {
+			margin-left: 20px;
+			cursor: pointer;
+		}
+		.title {
+			margin: 20px;
+			text-align: center;
+		}
+		.availability-data {
+			margin-bottom: 10px;
+		}
+	</style>
+</head>
+<body>
+	<form action="javascript:void(0)">
+		<input type="text" class='pincode' placeholder="Pincode" pattern='^\d{6}$' title='Your 6 digit area pincode.' required />
+		<input type="number" class='interval' placeholder="Interval" value="5" min=1 max=60 title='Time interval in minutes.' required />
+		minutes
+		<button class='init-button'>Start</button>
+		
+	</form>
+	<div class='title'>Checking for vaccination centers every <span class='interval'>5</span> minutes.<br/>Please play/pause the notification sound and adjust the system volume accordingly.<br/>Ensure that your system doesn't sleep/hibernate.</div>
+	<div class='availability-data'></div>
+	<div id='sound-alert'></div>
+	<audio autoplay loop controls>
+		<source src="https://notificationsounds.com//storage/sounds/file-sounds-1152-swinging.mp3" type="audio/mpeg">
+	</audio>
+</body>
+</html>
