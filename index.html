@@ -1,8 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Vaccine Availability</title>
+	<title>18+ Vaccine Availability</title>
 	<script type="text/javascript">
+		let displayDate = (date) => {
+			if(!date || !(date instanceof Date)) {
+				return (new Date()).toLocaleString();
+			} else {
+				return date.toLocaleString();
+			}
+		}
+
+		let afterFewMins = (mins, date) => {
+			if(!mins) throw Error('Mandatory few minutes.');
+			if(!date || !(date instanceof Date)) {
+				date = new Date();
+			}
+			return displayDate(new Date(date.getTime() + mins*60*1000));
+		}
+
 		async function getCenters(pincode) {
 			let today = new Date();
 			let datestr = `${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()}`;
@@ -19,9 +35,9 @@
 			});
 		}
 
-		let processInfo = async (pincode) => {
+		let processInfo = async (pincode, interval) => {
 			let centers = await getCenters(pincode);
-			let date = (new Date()).toLocaleString();
+			let date = displayDate();
 			let totalShots = centers.length ? centers.map(c => c.sessions).flat().filter(s => s.min_age_limit==18).map(s => s.available_capacity).reduce((c1,c2) => c1+c2) : 0;
 
 			console.log(centers);
@@ -40,9 +56,9 @@
 				audio.currentTime = 0;
 				responseDiv.innerHTML = `${date} ==> 0 centers.`;
 			}
-			let br = document.createElement('br');
-			document.querySelector('.availability-data').appendChild(br);
 			document.querySelector('.availability-data').appendChild(responseDiv);
+			document.querySelector('.next-timestamp').style.display='block';
+			document.querySelector('.next-timestamp span').innerHTML = afterFewMins(interval, date);
 
 		}
 
@@ -61,8 +77,8 @@
 			document.querySelector('body').removeChild(form);
 			document.querySelector('.title .interval').innerHTML = interval;
 			document.querySelector('.title .pincode').innerHTML = pincode;
-			processInfo(pincode);
-			let myInterval = setInterval(()=>processInfo(pincode), interval*60*1000);
+			processInfo(pincode, interval);
+			let myInterval = setInterval(()=>processInfo(pincode, interval), interval*60*1000);
 		}
 
 		window.onload = function() {
@@ -88,11 +104,14 @@
 		.availability-data {
 			margin-bottom: 10px;
 		}
+		.next-timestamp {
+			display: none;
+		}
 	</style>
 </head>
 <body>
 	<form action="javascript:void(0)">
-		<h3>Purpose of this tool</h3>
+		<h3>18+ Vaccine Availability</h3>
 		<p>Currently there is a shortage of vaccines for 18+. This tool notifies you as soon as a vaccination center has vaccines available for <strong>18+</strong> for the given pincode. You can set the time interval for which this tool checks the availability of vaccine shots.</p>
 		<hr/>
 		<input type="text" class='pincode' placeholder="Pincode" pattern='^\d{6}$' title='Your 6 digit area pincode.' required />
@@ -102,7 +121,7 @@
 		
 	</form>
 	<div class='title'>
-		Checking for vaccination centers every <strong><span class='interval'>_</span></strong> minutes for pincode <strong><span class='pincode'>______</span></strong> for 18+.
+		Checking for vaccination centers every <strong><span class='interval'>?</span></strong> minutes for pincode <strong><span class='pincode'>??????</span></strong> for 18+.
 		<br/>
 		<h4>Note:</h4>
 		<ul>
@@ -112,6 +131,7 @@
 		</ul>
 	</div>
 	<div class='availability-data'></div>
+	<div class='next-timestamp'>Next check at <span></span></div>
 	<div id='sound-alert'></div>
 	<audio autoplay loop controls>
 		<source src="https://notificationsounds.com//storage/sounds/file-sounds-1152-swinging.mp3" type="audio/mpeg">
