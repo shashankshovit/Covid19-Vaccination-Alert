@@ -1,0 +1,102 @@
+body {
+	padding: 0 50px;
+}
+h3.page-title {
+	color: #b461f3;
+	text-align: center;
+}
+
+input {
+	width: 100px;
+	padding: 5px;
+	border: 0;
+	border-bottom: 1px solid black;
+	outline: none;
+	color: royalblue;
+}
+input:focus {
+	border-bottom: 1px solid #59f559;
+}
+input.pincode + label.pin {
+	background: yellow;
+}
+button {
+	margin-left: 20px;
+	cursor: pointer;
+	width: 75px;
+	padding: 5px;
+	background: #41bd46;
+	border: 1px solid green;
+	color: white;
+	border-radius: 5px;
+	box-shadow: 0px 0px 10px 3px #59f559;
+}
+.body-head {
+	margin: 10px 0;
+}
+.body-head .note {
+	background: #ffffbf;
+	padding: 5px 20px;
+}
+.body-head .note .note-heading {
+	font-weight: 900;
+	font-size: 17px;
+}
+.body-head .info {
+	display: none;
+	margin: 10px 0;
+	color: #008bf9;
+}
+.availability-title {
+	display: none;
+}
+.availability-data {
+	margin-bottom: 10px;
+}
+.next-timestamp {
+	display: none;
+	text-align: center;
+	margin: 25px;
+	color: #e89600;
+	font-weight: 900;
+}
+.tile {
+	border-radius: 25px;
+	padding: 10px 25px;
+	margin: 5px 0;
+}
+.tile.green {
+	background: #ddffdd;
+	border: 1px solid green;
+	box-shadow: 2px 2px 5px darkgreen;
+	color: darkgreen;
+}
+.tile.red {
+	background: pink;
+	border: 1px solid red;
+	box-shadow: 2px 2px 5px darkred;
+	color: darkred;
+}
+.tile .row {
+	display: flex;
+	justify-content: space-between;
+}
+.tile .center-row {
+	display: flex;
+}
+.tile .center-row span {
+	width: 200px;
+}
+.tile a {
+	background: #37bfff;
+	border-radius: 25px;
+	color: white;
+	text-decoration: none;
+	text-align: center;
+	width: 200px;
+	box-shadow: 0px 0px 5px black;
+	vertical-align: middle;
+	font-weight: 900;
+	margin: 5px auto 0;
+	padding: 5px;
+}
