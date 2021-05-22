@@ -5,30 +5,54 @@ h3.page-title {
 	color: #b461f3;
 	text-align: center;
 }
-
+.form-row {
+	display: flex;
+	justify-content: center;
+	margin: 10px;
+}
+.wrapper {
+	position: relative;
+	margin: 0 10px;
+}
 input {
-	width: 100px;
+	width: 150px;
 	padding: 5px;
 	border: 0;
 	border-bottom: 1px solid black;
 	outline: none;
 	color: royalblue;
+	background: transparent;
+
 }
 input:focus {
 	border-bottom: 1px solid #59f559;
 }
-input.pincode + label.pin {
-	background: yellow;
+input + span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 5px;
+    text-align: center;
+    z-index: -1;
+    transition: all 0.3s;
+    width: 100%;
+    color: #add8ff;
+}
+input:focus + span, input:valid + span {
+	font-size: 12px;
+	top: -12px;
+	font-weight: 900;
+	color: #0095ce;
 }
 button {
-	margin-left: 20px;
 	cursor: pointer;
-	width: 75px;
-	padding: 5px;
+	width: 200px;
+	padding: 10px;
 	background: #41bd46;
 	border: 1px solid green;
 	color: white;
 	border-radius: 5px;
+	font-weight: 100;
 }
 button:hover {
 	box-shadow: 0px 0px 10px 3px #59f559;
@@ -81,10 +105,16 @@ button:hover {
 }
 .tile .row {
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-evenly;
+	flex-wrap: wrap;
+}
+.tile .row span {
+	width: 150px;
+	text-align: center;
 }
 .tile .center-row {
 	display: flex;
+	border-top: 1px solid #b2ff58;
 }
 .tile .center-row span {
 	width: 200px;

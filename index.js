@@ -52,6 +52,7 @@ let getTile = (ts, data) => {
 		if(!centerSessions.length) continue;
 		let crow = document.createElement('div');
 		crow.classList.add('center-row');
+		crow.classList.add('row');
 		let centerName = document.createElement('span');
 		centerName.innerHTML = `${center.name} (${center.fee_type})`;
 		crow.appendChild(centerName);
@@ -80,10 +81,8 @@ let processInfo = async (pincode, interval) => {
 	let date = displayDate();
 	let data = {};
 	data.totalCenters = centers.length;
-	centers = centers.filter(c => c.sessions?.some(s => s.min_age_limit<45));
+	centers = centers.filter(c => c.sessions?.some(s => s.available_capacity && s.min_age_limit<45));
 	data.eighteenPlus = centers.length;
-	centers = centers.filter(c => c.sessions?.some(s => s.available_capacity>0));
-	data.hasVaccines = centers.length;
 	data.totalShots = centers.length
 		? centers.map(c => c.sessions).flat().filter(s => s.min_age_limit==18).map(s => s.available_capacity).reduce((a,b) => a+b)
 		: 0;

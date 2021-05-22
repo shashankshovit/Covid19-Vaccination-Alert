@@ -4,6 +4,7 @@
 	<title>18+ Vaccine Availability</title>
 	<link rel="stylesheet" type="text/css" href="./index.css">
 	<script type="text/javascript" src="./index.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 	<div class='header'>
@@ -13,10 +14,19 @@
 		</p>
 
 		<form action="javascript:void(0)">
-			<input type="text" class='pincode' placeholder="Pincode" pattern='^\d{6}$' title='Your 6 digit area pincode.' required />
-			<input type="number" class='interval' placeholder="Interval" value="5" min=1 max=60 title='Time interval in minutes.' required />
-			minutes
-			<button class='init-button'>Start</button>			
+			<div class='form-row'>
+				<div class='wrapper'>
+					<input type="text" class='pincode' title='Your 6 digit area pincode.' required />
+					<span>Pincode</span>
+				</div>
+				<div class='wrapper'>
+					<input type="number" class='interval' min=1 max=60 title='Time interval in minutes.' required />
+					<span>Interval (mins)</span>
+				</div>
+			</div>
+			<div class='form-row'>
+				<button class='init-button'>Start</button>			
+			</div>
 		</form>
 	</div>
 	<div class='body-head'>
