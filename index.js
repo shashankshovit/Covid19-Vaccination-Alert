@@ -61,6 +61,8 @@ let getTile = (ts, data) => {
 			crow.appendChild(session);
 		}
 		tile.appendChild(crow);
+	}
+	if(data.totalShots) {
 		row = document.createElement('div');
 		row.classList.add('row');
 		tile.appendChild(row);
