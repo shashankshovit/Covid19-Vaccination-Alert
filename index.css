@@ -1,7 +1,8 @@
 body {
 	padding: 0 50px;
+	font-family: sans-serif;
 }
-h3.page-title {
+h2.page-title {
 	color: #b461f3;
 	text-align: center;
 }
@@ -16,7 +17,7 @@ h3.page-title {
 }
 input {
 	width: 150px;
-	padding: 5px;
+	padding: 10px;
 	border: 0;
 	border-bottom: 1px solid black;
 	outline: none;
@@ -40,9 +41,63 @@ input + span {
 }
 input:focus + span, input:valid + span {
 	font-size: 12px;
-	top: -12px;
+	top: -10px;
 	font-weight: 900;
 	color: #0095ce;
+}
+.filter {
+    text-align: center;
+    border: 1px solid #5aa1df;
+    border-radius: 5px;
+    color: #5aa1df;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    margin: 0 2px;
+    padding: 0 15px;
+}
+.filter:hover {
+	background: #bbdfff;
+}
+.filter.selected {
+	background: #5aa1df;
+	color: white;
+}
+.delete-row {
+	cursor: pointer;
+	font-weight: 900;
+	margin: auto auto auto 20px;
+	height: 20px;
+	text-align: center;
+	color: maroon;
+	border: 1px solid #df8e8e;
+	border-radius: 3px;
+	padding: 0 8px;
+}
+.delete-row:hover {
+	border-color: maroon;
+	background: maroon;
+	color: white;
+}
+.add {
+    display: inline-flex;
+    padding: 0 60px;
+    margin: 0 10px;
+    flex-flow: row wrap;
+    align-content: center;
+    font-size: 25px;
+    font-weight: 900;
+    cursor: pointer;
+    border: 1px solid #08f;
+    color: #08f;
+    border-radius: 3px;
+}
+.add:hover {
+	background: #08f;
+	color: white;
 }
 button {
 	cursor: pointer;
@@ -52,7 +107,7 @@ button {
 	border: 1px solid green;
 	color: white;
 	border-radius: 5px;
-	font-weight: 100;
+	font-weight: 900;
 }
 button:hover {
 	box-shadow: 0px 0px 10px 3px #59f559;
@@ -62,11 +117,37 @@ button:hover {
 }
 .body-head .note {
 	background: #ffffbf;
-	padding: 5px 20px;
+	padding: 10px 20px 1px;
 }
 .body-head .note .note-heading {
 	font-weight: 900;
 	font-size: 17px;
+	position: relative;
+}
+.body-head .note .note-heading span {
+    width: 10px;
+    display: block;
+    height: 10px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 3px solid black;
+    border-top: none;
+    border-right: none;
+    transform: rotateZ(-45deg);
+	transition: transform 0.5s;
+	cursor: pointer;
+}
+.body-head .note.collapsed .note-heading span {
+	transform: rotateZ(45deg);
+}
+.body-head .note .note-content {
+	max-height: 500px;
+	transition: all 0.5s;
+	overflow: hidden;
+}
+.body-head .note.collapsed .note-content {
+	max-height: 0;
 }
 .body-head .info {
 	display: none;
@@ -78,6 +159,7 @@ button:hover {
 }
 .availability-data {
 	margin-bottom: 10px;
+	position: relative;
 }
 .next-timestamp {
 	display: none;
@@ -87,8 +169,8 @@ button:hover {
 	font-weight: 900;
 }
 .tile {
-	border-radius: 25px;
-	padding: 10px 25px;
+	border-radius: 10px;
+	padding: 5px 10px;
 	margin: 5px 0;
 }
 .tile.green {
@@ -103,21 +185,62 @@ button:hover {
 	box-shadow: 2px 2px 5px darkred;
 	color: darkred;
 }
+.tile .summary {
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 14px;
+}
+.tile.green .summary {
+	background: green;
+}
+.tile.red .summary {
+	background: maroon;
+}
 .tile .row {
 	display: flex;
 	justify-content: space-evenly;
 	flex-wrap: wrap;
 }
 .tile .row span {
-	width: 160px;
 	text-align: center;
+	text-transform: capitalize;
+	position: relative;
+}
+.tile .row .name {
+	width: 200px;
+}
+.tile .row .name span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+    display: inline-block;
 }
 .tile .center-row {
 	display: flex;
 	border-top: 1px solid #b2ff58;
 }
-.tile .center-row span {
-	width: 200px;
+.tile .center-row .name .paid {
+    background: yellow;
+    border: 1px solid orange;
+    font-size: 10px;
+    display: block;
+    height: 13px;
+    width: 13px;
+    position: absolute;
+    border-radius: 100%;
+    font-weight: 900;
+    text-align: center;
+    color: orange;
+    top: -5px;
+    right: 0;
+    cursor: help;
+}
+.tile .center-row span.partition {
+    border-left: 1px solid #6be16b;
+    height: 12px;
+    margin: auto;
 }
 .tile a {
 	background: #37bfff;

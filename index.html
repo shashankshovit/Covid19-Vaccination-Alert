@@ -1,46 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>18+ Vaccine Availability</title>
+	<title>Vaccine Availability Notifier</title>
 	<link rel="stylesheet" type="text/css" href="./index.css">
 	<script type="text/javascript" src="./index.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 	<div class='header'>
-		<h3 class='page-title'>18+ Vaccine Availability</h3>
+		<h2 class='page-title'>Vaccine Availability Notifier</h2>
 		<p>
-			Currently there is a shortage of vaccines for 18+. This tool notifies you as soon as a vaccination center has vaccines available for <strong>18+</strong> for the given pincode. You can set the time interval for which this tool checks the availability of vaccine shots.
+			This tool checks for the vaccine availability every 5 minutes and notifies you as soon as your selected vaccine becomes available at a center. You can track multiple pincodes with your vaccine filters applied.
 		</p>
 
 		<form action="javascript:void(0)">
-			<div class='form-row'>
-				<div class='wrapper'>
-					<input type="text" class='pincode' title='Your 6 digit area pincode.' required />
-					<span>Pincode</span>
-				</div>
-				<div class='wrapper'>
-					<input type="number" class='interval' min=1 max=60 title='Time interval in minutes.' required />
-					<span>Interval (mins)</span>
-				</div>
+			<div class="form-row">
+				<div class='add' title='Track multiple locations. Click to add another row.'>+</div>
 			</div>
 			<div class='form-row'>
-				<button class='init-button'>Start</button>			
+				<button class='init-button'>Start</button>
 			</div>
 		</form>
 	</div>
 	<div class='body-head'>
 		<div class='note'>
-			<div class='note-heading'>Note:</div>
+			<div class='note-heading'>Note:<span></span></div>
+			<div class='note-content'>
 			<ul>
 				<li>This tool works best on laptop/desktop. Mobile OS kills the browser tab, hence the script.</li>
 				<li>Please play/pause the notification sound and adjust the system volume accordingly.</li>
 				<li>Ensure that your system doesn't sleep/hibernate.</li>
 			</ul>
+			</div>
 		</div>
-		<div class="info">
-			Checking for vaccination centers every <strong><span class='interval'>?</span></strong> minutes for pincode <strong><span class='pincode'>??????</span></strong>.
-		</div>
+		<!-- <div class="info">
+		</div> -->
 	</div>
 	<div class='availability-data'></div>
 	<div class='next-timestamp'>Next check at <span></span></div>

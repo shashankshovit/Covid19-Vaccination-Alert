@@ -1,9 +1,90 @@
+let element = (element, options) => {
+	`Returns a element with given options. Accepted attributes in options defined below.
+		cls: <Array>
+		dataset: <Object>
+		html: <String>
+
+	`
+	let defaultOpts = {
+		cls: [],
+		dataset: {},
+		html: null
+	};
+	options = Object.assign(defaultOpts, options);
+	let dv = document.createElement(element);
+
+	// classes
+	if(!(options.cls instanceof Array || typeof(options.cls) === 'string')) {
+		throw `Attribute cls can be: Array/String`;
+	}
+	if(typeof options.cls === 'string') { options.cls = [options.cls]; }
+	for(let clas of options.cls) {
+		dv.classList.add(clas);
+	}
+	delete options.cls;
+
+	// dataset
+	for(let dt in options.dataset) {
+		dv.dataset[dt] = options.dataset[dt];
+	}
+	delete options.dataset;
+
+	// innerHTML
+	if(options.html) { dv.innerHTML = options.html; }
+	delete options.html;
+
+	// Other attributes
+	for(let attr in options) {
+		dv[attr] = options[attr];
+	}
+	
+	return dv;
+}
+
+let div = (options) => element('div', options);
+let span = (options) => element('span', options);
+let input = (options) => element('input', options);
+
+let addQueryTile = () => {
+	let formRow = div({cls: ['form-row', 'query']});
+	let wrapper = div({cls: 'wrapper'});
+	formRow.appendChild(wrapper);
+	wrapper.appendChild(input({type: 'text', cls: 'pincode', required: true, title: 'Your 6 digit area pincode.'}));
+	wrapper.appendChild(span({html: 'Pincode'}));
+	formRow.appendChild(div({cls: ['filter', 'age'], html: '18+', dataset: {age: 18}}));
+	formRow.appendChild(div({cls: ['filter', 'age'], html: '45+', dataset: {age: 45}}));
+	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covaxin', dataset: {name: 'COVAXIN'}}));
+	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covishield', dataset: {name: 'COVISHIELD'}}));
+	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Sputnik V', dataset: {name: 'SPUTNIK V'}}));
+	for(let button of Array.from(formRow.querySelectorAll('.filter'))) {
+		button.addEventListener('click', (evt) => {
+			evt.target.classList.contains('selected')
+				? evt.target.classList.remove('selected')
+				: evt.target.classList.add('selected');
+		});
+	}
+	let cross = div({cls: 'delete-row', html: '-', title: 'Delete this row.'});
+	cross.addEventListener('click', (evt) => {
+		evt.target.parentElement.parentElement.removeChild(evt.target.parentElement);
+	});
+	formRow.appendChild(cross);
+
+	let form = document.querySelector('form');
+	let addButton = form.children[form.children.length - 2]
+	let submitButton = form.children[form.children.length - 1];
+	form.removeChild(addButton);
+	form.removeChild(submitButton);
+	form.appendChild(formRow);
+	form.appendChild(addButton);
+	form.appendChild(submitButton);
+}
+
 let displayDate = (date) => {
 	if(!date || !(date instanceof Date)) {
-		return (new Date()).toLocaleString();
-	} else {
-		return date.toLocaleString();
+		date = new Date();
 	}
+	let month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	return `${date.getDate()} ${month[date.getMonth()]} | ${date.toLocaleTimeString()}`;
 }
 
 let afterFewMins = (mins, date) => {
@@ -24,105 +105,145 @@ async function getCenters(pincode) {
 	return res.centers;
 }
 
-let getTile = (ts, data) => {
-	let tile = document.createElement('div');
-	tile.classList.add('tile');
+let getTile = (ts, data, pincode) => {
+	let tile = div({cls: 'tile'});
 	data.totalShots > 0 ? tile.classList.add('green') : tile.classList.add('red');
-	let row = document.createElement('div');
-	row.classList.add('row');
-	let timestamp = document.createElement('span');
-	timestamp.classList.add('timestamp');
-	timestamp.innerHTML = ts;
-	let centersCount = document.createElement('span');
-	centersCount.classList.add('centers');
-	centersCount.innerHTML = `Total centers: ${data.totalCenters}`;
-	let centers_18 = document.createElement('span');
-	centers_18.innerHTML = `18+ centers: <strong>${data.eighteenPlus}</strong>`;
-	let totalDoses = document.createElement('span');
-	totalDoses.innerHTML = `Total 18+ doses: <strong>${data.totalShots}</strong>`;
-	row.appendChild(timestamp);
-	row.appendChild(centersCount);
-	row.appendChild(centers_18);
-	row.appendChild(totalDoses);
-	tile.appendChild(row);
+	let summary = div({cls: ['row', 'summary']});
+	summary.appendChild(span({cls: 'timestamp', html: displayDate(ts)}));
+	summary.appendChild(span({html: `Pincode: <strong>${pincode}</strong>`}))
+	summary.appendChild(span({cls: 'centers', html: `Centers: <strong>${data.centers.length}</strong>/${data.totalCenters}`}));
+	summary.appendChild(span({html: `Doses: <strong>${data.totalShots}</strong>`}));
+	tile.appendChild(summary);
 	for(let center of data.centers) {
 		let parseDate = (date) => new Date(date.split('-').reverse().join('-'));
-		let centerSessions = center.sessions?.filter(s => s.min_age_limit==18)
-								.sort((s1, s2) => parseDate(s1.date)-parseDate(s2.date));
+		let centerSessions = center.sessions?.sort((s1, s2) => parseDate(s1.date)-parseDate(s2.date));
 		if(!centerSessions.length) continue;
-		let crow = document.createElement('div');
-		crow.classList.add('center-row');
-		crow.classList.add('row');
-		let centerName = document.createElement('span');
-		centerName.innerHTML = `${center.name} (${center.fee_type})`;
-		crow.appendChild(centerName);
+		let crow = div({cls: ['center-row', 'row']});
+		let nameSpan = span({cls: 'name'});
+		nameSpan.appendChild(span({html: `${center.name.toLowerCase()}`, title: `${center.name} (${center.fee_type})`}));
+		if(center.fee_type == 'Paid') {
+			nameSpan.appendChild(span({cls: 'paid', html: '$', title: `Vaccine is Paid`}));
+		}
+		crow.appendChild(nameSpan);
 		for(let ss of centerSessions) {
-			let session = document.createElement('span');
-			session.innerHTML = `${ss.date}: <strong>${ss.available_capacity}</strong>`;
-			crow.appendChild(session);
+			crow.appendChild(span({html: `${ss.date}|${ss.min_age_limit}+ ${ss.vaccine.toLowerCase()}(${ss.available_capacity})`}));
 		}
 		tile.appendChild(crow);
+		// -----------------
+		// for(let ss of centerSessions) {
+		// 	let row = div({cls: ['center-row', 'row']});
+		// 	tile.appendChild(row);
+		// 	row.appendChild(span({html: `${center.name.toLowerCase()}`, title: `${center.name}`}));
+		// 	row.appendChild(span({html: `${ss.date}`}));
+		// 	row.appendChild(span({html: `${ss.min_age_limit}+`}));
+		// 	row.appendChild(span({html: `${ss.vaccine.toLowerCase()}`}));
+		// 	row.appendChild(span({html: `${center.fee_type}`}));
+		// }
 	}
 	if(data.totalShots) {
-		row = document.createElement('div');
-		row.classList.add('row');
+		row = div({cls: 'row'})
 		tile.appendChild(row);
-		let anchor = document.createElement('a');
-		anchor.href = 'https://selfregistration.cowin.gov.in/';
-		anchor.innerHTML = 'Book Slot';
-		anchor.target = '_blank';
-		row.appendChild(anchor);
+		row.appendChild(element('a', {href: 'https://selfregistration.cowin.gov.in/', html: 'Book Slot', target: '_blank'}));
 	}
 	return tile;
 }
 
-let processInfo = async (pincode, interval) => {
+let processInfoAfterQuery = async (query, ts) => {
+	let pincode = query.pincode;
 	let centers = await getCenters(pincode);
-	let date = displayDate();
+	console.log(centers);
 	let data = {};
 	data.totalCenters = centers.length;
-	centers = centers.filter(c => c.sessions?.some(s => s.available_capacity && s.min_age_limit<45));
-	data.eighteenPlus = centers.length;
+	centers = centers.filter(c => c.sessions?.some(s => s.available_capacity));
+
+	// --- Age Filters ---
+	if(query.filters.age.length) {
+		centers = centers.filter(c => {
+			c.sessions = c.sessions.filter(s => query.filters.age.includes(s.min_age_limit));
+			if(c.sessions.length) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+	}
+	// --- Vaccine Filters ---
+	if(query.filters.vaccine.length) {
+		centers = centers.filter(c => {
+			c.sessions = c.sessions.filter(s => query.filters.vaccine.includes(s.vaccine));
+			if(c.sessions.length) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+	}
 	data.totalShots = centers.length
-		? centers.map(c => c.sessions).flat().filter(s => s.min_age_limit==18).map(s => s.available_capacity).reduce((a,b) => a+b)
+		? centers.map(c=>c.sessions).flat().map(s=>s.available_capacity).reduce((a,b)=>a+b)
 		: 0;
 	data.centers = centers;
-	let totalShots = centers.length ? centers.map(c => c.sessions).flat().filter(s => s.min_age_limit==18).map(s => s.available_capacity).reduce((c1,c2) => c1+c2) : 0;
 
 	console.log(centers);
-	let responseDiv = document.createElement('div');
+	document.querySelector('.availability-data').prepend(getTile(ts, data, pincode));
+	return data.totalShots;
+}
+
+let fetchResults = async (queries, interval) => {
+	let ts = new Date();
+	let shots = await Promise.all(queries.map(query => processInfoAfterQuery(query, ts)));
 	let audio = document.querySelector('audio');
-	if(centers.length) {
+	if(shots.reduce((a,b) => a+b)) {
 		if(audio.paused) audio.play();
 	} else {
 		audio.pause();
 		audio.currentTime = 0;
 	}
-	document.querySelector('.body-head .info').style.display='block';
-	document.querySelector('.availability-data').appendChild(getTile(date, data));
 	document.querySelector('.next-timestamp').style.display='block';
-	document.querySelector('.next-timestamp span').innerHTML = afterFewMins(interval, date);
+	document.querySelector('.next-timestamp span').innerHTML = afterFewMins(interval, ts);
 }
 
-let startChecking = (evt) => {
-	let pincode = document.querySelector('form input.pincode').value;
-	let interval = document.querySelector('form input.interval').value;
-	if(!pincode || !pincode.match(/^\d{6}$/)) {
-		alert('Invalid Pincode!');
-		return false;
+let submitButtonClickHandler = (evt) => {
+	let queryDivs = Array.from(document.querySelectorAll('form .form-row.query'));
+	let queries = [];
+	for(let dv of queryDivs) {
+		let query = {};
+		query.pincode = dv.querySelector('input.pincode').value;
+			if(!query.pincode || !query.pincode.match(/^\d{6}$/)) {
+			alert('Invalid Pincode!');
+			return false;
+		}
+		query.filters = {};
+		query.filters.age = Array.from(dv.querySelectorAll('.filter.age.selected'))
+							.map(d => parseInt(d.dataset.age));
+		query.filters.vaccine = Array.from(dv.querySelectorAll('.filter.vaccine.selected'))
+								.map(d => d.dataset.name);
+		queries.push(query);
 	}
+	// let interval = document.querySelector('form input.interval').value;
+	let interval = 5;
 	if(!interval || interval<1) {
 		alert('Invalid Interval!');
 		return false;
 	}
 	let form = document.querySelector('form');
 	document.querySelector('body .header').removeChild(form);
-	document.querySelector('.body-head .interval').innerHTML = interval;
-	document.querySelector('.body-head .pincode').innerHTML = pincode;
-	processInfo(pincode, interval);
-	let myInterval = setInterval(()=>processInfo(pincode, interval), interval*60*1000);
+	document.querySelector('.note .note-heading span').click();
+	fetchResults(queries, interval);
+	let myInterval = setInterval(()=>fetchResults(queries, interval), interval*60*1000);
+}
+
+let noteCollapseClickHandler = (evt) => {
+	let note = evt.target.parentElement.parentElement;
+	if(note.classList.contains('collapsed')) {
+		note.classList.remove('collapsed');
+	} else {
+		note.classList.add('collapsed');
+	}
 }
 
 window.onload = function() {
-	document.querySelector('button.init-button').addEventListener('click', startChecking);
+	addQueryTile();
+	document.querySelector('button.init-button').addEventListener('click', submitButtonClickHandler);
+	document.querySelector('form .add').addEventListener('click', addQueryTile);
+	document.querySelector('.note .note-heading span').addEventListener('click', noteCollapseClickHandler);
 }
