@@ -9,7 +9,9 @@ h2.page-title {
 .form-row {
 	display: flex;
 	justify-content: center;
-	margin: 10px;
+	margin: 20px 10px;
+	align-items: center;
+	flex-wrap: wrap;
 }
 .wrapper {
 	position: relative;
@@ -56,8 +58,8 @@ input:focus + span, input:valid + span {
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
-    margin: 0 2px;
-    padding: 0 15px;
+    margin: 1px 2px;
+    padding: 8px 15px;
 }
 .filter:hover {
 	background: #bbdfff;
@@ -69,7 +71,7 @@ input:focus + span, input:valid + span {
 .delete-row {
 	cursor: pointer;
 	font-weight: 900;
-	margin: auto auto auto 20px;
+	margin-left: 5px;
 	height: 20px;
 	text-align: center;
 	color: maroon;
