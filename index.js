@@ -107,7 +107,15 @@ async function getCenters(pincode) {
 
 let getTile = (ts, data, pincode) => {
 	let tile = div({cls: 'tile'});
-	data.totalShots > 0 ? tile.classList.add('green') : tile.classList.add('red');
+	if(data.totalShots === 0) {
+		// default gray tile
+	} else if(data.totalShots <= 5) {
+		tile.classList.add('red');
+	} else if(data.totalShots <= 25) {
+		tile.classList.add('orange');
+	} else {
+		tile.classList.add('green');
+	}
 	let summary = div({cls: ['row', 'summary']});
 	summary.appendChild(span({cls: 'timestamp', html: displayDate(ts)}));
 	summary.appendChild(span({html: `Pincode: <strong>${pincode}</strong>`}))
@@ -119,26 +127,25 @@ let getTile = (ts, data, pincode) => {
 		let centerSessions = center.sessions?.sort((s1, s2) => parseDate(s1.date)-parseDate(s2.date));
 		if(!centerSessions.length) continue;
 		let crow = div({cls: ['center-row', 'row']});
-		let nameSpan = span({cls: 'name'});
-		nameSpan.appendChild(span({html: `${center.name.toLowerCase()}`, title: `${center.name} (${center.fee_type})`}));
+		let nameDiv = div({cls: 'name'});
+		nameDiv.appendChild(span({html: `${center.name.toLowerCase()}`, title: `${center.name} (${center.fee_type})`}));
 		if(center.fee_type == 'Paid') {
-			nameSpan.appendChild(span({cls: 'paid', html: '$', title: `Vaccine is Paid`}));
+			nameDiv.appendChild(span({cls: 'paid', html: '$', title: `Vaccine is Paid`}));
 		}
-		crow.appendChild(nameSpan);
+		crow.appendChild(nameDiv);
+		let sessionsDiv = div({cls: 'sessions'});
+		crow.appendChild(sessionsDiv);
 		for(let ss of centerSessions) {
-			crow.appendChild(span({html: `${ss.date}|${ss.min_age_limit}+ ${ss.vaccine.toLowerCase()}(${ss.available_capacity})`}));
+			let miniTile = div({cls: 'mini-tile'});
+			miniTile.appendChild(div({cls: 'date', html: `${ss.date}`}));
+			miniTile.appendChild(div({cls: 'vaccine', html: `${ss.vaccine.toLowerCase()}`}));
+			let age_shot = div({cls: 'age-shot'});
+			miniTile.appendChild(age_shot);
+			age_shot.appendChild(div({cls: 'age', html: `${ss.min_age_limit}+`}))
+			age_shot.appendChild(div({cls: 'shot', html: `<strong>${ss.available_capacity}</strong>`}));
+			sessionsDiv.appendChild(miniTile);
 		}
 		tile.appendChild(crow);
-		// -----------------
-		// for(let ss of centerSessions) {
-		// 	let row = div({cls: ['center-row', 'row']});
-		// 	tile.appendChild(row);
-		// 	row.appendChild(span({html: `${center.name.toLowerCase()}`, title: `${center.name}`}));
-		// 	row.appendChild(span({html: `${ss.date}`}));
-		// 	row.appendChild(span({html: `${ss.min_age_limit}+`}));
-		// 	row.appendChild(span({html: `${ss.vaccine.toLowerCase()}`}));
-		// 	row.appendChild(span({html: `${center.fee_type}`}));
-		// }
 	}
 	if(data.totalShots) {
 		row = div({cls: 'row'})
