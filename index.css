@@ -221,10 +221,6 @@ button:hover {
 	position: relative;
 }
 .tile .row .name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block;
 }
 .tile .center-row {
 	display: flex;
@@ -252,8 +248,8 @@ button:hover {
     font-weight: 900;
     text-align: center;
     color: orange;
-    top: -5px;
-    right: 0;
+    top: -9px;
+    right: -10px;
     cursor: help;
 }
 .tile .center-row .sessions {
@@ -334,4 +330,10 @@ button:hover {
 }
 .tile a:hover {
 	box-shadow: 0px 0px 10px blue;
+}
+.footer {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid gray;
+	text-align: center;
 }

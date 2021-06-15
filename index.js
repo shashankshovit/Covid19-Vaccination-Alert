@@ -200,7 +200,9 @@ let fetchResults = async (queries, interval) => {
 	let shots = await Promise.all(queries.map(query => processInfoAfterQuery(query, ts)));
 	let audio = document.querySelector('audio');
 	if(shots.reduce((a,b) => a+b)) {
-		if(audio.paused) audio.play();
+		audio.paused && audio.play();
+		audio.muted = false;
+		audio.volume = 1;
 	} else {
 		audio.pause();
 		audio.currentTime = 0;
@@ -232,8 +234,7 @@ let submitButtonClickHandler = (evt) => {
 		alert('Invalid Interval!');
 		return false;
 	}
-	let form = document.querySelector('form');
-	document.querySelector('body .header').removeChild(form);
+	document.querySelector('body').removeChild(document.querySelector('.header'));
 	document.querySelector('.note .note-heading span').click();
 	fetchResults(queries, interval);
 	let myInterval = setInterval(()=>fetchResults(queries, interval), interval*60*1000);

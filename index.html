@@ -7,10 +7,21 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+	<h2 class='page-title'>Vaccine Availability Notifier</h2>
 	<div class='header'>
-		<h2 class='page-title'>Vaccine Availability Notifier</h2>
 		<p>
 			This tool checks for the vaccine availability every 5 minutes and notifies you as soon as your selected vaccine becomes available at a center. You can track multiple pincodes with your vaccine filters applied.
+		</p>
+		<h3>Instructions:</h3>
+		<p>
+			<ol>
+				<li>Enter your pincode. Apply filters.</li>
+				<li>Click on the '+' button to add more rows if you need to track multiple pincodes.</li>
+				<li>Delete unwanted rows by clicking '-' button at the end of row.</li>
+				<li>Play/pause the audio to get familiar with the alert sound. Adjust the system volume accordingly. This alert audio is played automatically when the tool finds a center of your choice.</li>
+				<li>Click on 'Start' button.</li>
+				<li>Relax.</li>
+			</ol>
 		</p>
 
 		<form action="javascript:void(0)">
@@ -42,5 +53,8 @@
 	</audio>
 	<div class='next-timestamp'>Next check at <span></span></div>
 	<div class='availability-data'></div>
+	<div class="footer">
+		The code for this tool can be found on Github. <a href="https://github.com/shashankshovit/vaccine/" target="_blank">Here is the link.</a>
+	</div>
 </body>
 </html>
