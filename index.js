@@ -1,4 +1,4 @@
-let element = (element, options) => {
+const element = (element, options) => {
 	`Returns a element with given options. Accepted attributes in options defined below.
 		cls: <Array>
 		dataset: <Object>
@@ -45,7 +45,7 @@ let div = (options) => element('div', options);
 let span = (options) => element('span', options);
 let input = (options) => element('input', options);
 
-let addQueryTile = () => {
+const addQueryTile = () => {
 	let formRow = div({cls: ['form-row', 'query']});
 	let wrapper = div({cls: 'wrapper'});
 	formRow.appendChild(wrapper);
@@ -56,6 +56,8 @@ let addQueryTile = () => {
 	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covaxin', dataset: {name: 'COVAXIN'}}));
 	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covishield', dataset: {name: 'COVISHIELD'}}));
 	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Sputnik V', dataset: {name: 'SPUTNIK V'}}));
+	formRow.appendChild(div({cls: ['filter', 'price'], html: 'Free', dataset: {price: 'Free'}}));
+	formRow.appendChild(div({cls: ['filter', 'price'], html: 'Paid', dataset: {price: 'Paid'}}));
 	for(let button of Array.from(formRow.querySelectorAll('.filter'))) {
 		button.addEventListener('click', (evt) => {
 			evt.target.classList.contains('selected')
@@ -79,7 +81,7 @@ let addQueryTile = () => {
 	form.appendChild(submitButton);
 }
 
-let displayDate = (date) => {
+const displayDate = (date) => {
 	if(!date || !(date instanceof Date)) {
 		date = new Date();
 	}
@@ -87,7 +89,7 @@ let displayDate = (date) => {
 	return `${date.getDate()} ${month[date.getMonth()]} | ${date.toLocaleTimeString()}`;
 }
 
-let afterFewMins = (mins, date) => {
+const afterFewMins = (mins, date) => {
 	if(!mins) throw Error('Mandatory few minutes.');
 	if(!date || !(date instanceof Date)) {
 		date = new Date();
@@ -105,7 +107,7 @@ async function getCenters(pincode) {
 	return res.centers;
 }
 
-let getTile = (ts, data, pincode) => {
+const getTile = (ts, data, pincode) => {
 	let tile = div({cls: 'tile'});
 	if(data.totalShots === 0) {
 		// default gray tile
@@ -155,7 +157,7 @@ let getTile = (ts, data, pincode) => {
 	return tile;
 }
 
-let processInfoAfterQuery = async (query, ts) => {
+const processInfoAfterQuery = async (query, ts) => {
 	let pincode = query.pincode;
 	let centers = await getCenters(pincode);
 	console.log(centers);
@@ -185,6 +187,11 @@ let processInfoAfterQuery = async (query, ts) => {
 			}
 		});
 	}
+	// --- Price Filters ---
+	if(query.filters.price.length) {
+		centers = centers.filter(c => query.filters.price.includes(c.fee_type));
+	}
+
 	data.totalShots = centers.length
 		? centers.map(c=>c.sessions).flat().map(s=>s.available_capacity).reduce((a,b)=>a+b)
 		: 0;
@@ -195,7 +202,7 @@ let processInfoAfterQuery = async (query, ts) => {
 	return data.totalShots;
 }
 
-let fetchResults = async (queries, interval) => {
+const fetchResults = async (queries, interval) => {
 	let ts = new Date();
 	let shots = await Promise.all(queries.map(query => processInfoAfterQuery(query, ts)));
 	let audio = document.querySelector('audio');
@@ -211,7 +218,7 @@ let fetchResults = async (queries, interval) => {
 	document.querySelector('.next-timestamp span').innerHTML = afterFewMins(interval, ts);
 }
 
-let submitButtonClickHandler = (evt) => {
+const submitButtonClickHandler = (evt) => {
 	let queryDivs = Array.from(document.querySelectorAll('form .form-row.query'));
 	let queries = [];
 	for(let dv of queryDivs) {
@@ -226,6 +233,8 @@ let submitButtonClickHandler = (evt) => {
 							.map(d => parseInt(d.dataset.age));
 		query.filters.vaccine = Array.from(dv.querySelectorAll('.filter.vaccine.selected'))
 								.map(d => d.dataset.name);
+		query.filters.price = Array.from(dv.querySelectorAll('.filter.price.selected'))
+								.map(d => d.dataset.price);
 		queries.push(query);
 	}
 	// let interval = document.querySelector('form input.interval').value;
@@ -240,7 +249,7 @@ let submitButtonClickHandler = (evt) => {
 	let myInterval = setInterval(()=>fetchResults(queries, interval), interval*60*1000);
 }
 
-let noteCollapseClickHandler = (evt) => {
+const noteCollapseClickHandler = (evt) => {
 	let note = evt.target.parentElement.parentElement;
 	if(note.classList.contains('collapsed')) {
 		note.classList.remove('collapsed');
