@@ -51,13 +51,24 @@ const addQueryTile = () => {
 	formRow.appendChild(wrapper);
 	wrapper.appendChild(input({type: 'text', cls: 'pincode', required: true, title: 'Your 6 digit area pincode.'}));
 	wrapper.appendChild(span({html: 'Pincode'}));
-	formRow.appendChild(div({cls: ['filter', 'age'], html: '18+', dataset: {age: 18}}));
-	formRow.appendChild(div({cls: ['filter', 'age'], html: '45+', dataset: {age: 45}}));
-	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covaxin', dataset: {name: 'COVAXIN'}}));
-	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covishield', dataset: {name: 'COVISHIELD'}}));
-	formRow.appendChild(div({cls: ['filter', 'vaccine'], html: 'Sputnik V', dataset: {name: 'SPUTNIK V'}}));
-	formRow.appendChild(div({cls: ['filter', 'price'], html: 'Free', dataset: {price: 'Free'}}));
-	formRow.appendChild(div({cls: ['filter', 'price'], html: 'Paid', dataset: {price: 'Paid'}}));
+	const groupCost = div({cls: 'group'});
+	formRow.appendChild(groupCost);
+	groupCost.appendChild(div({cls: ['filter', 'price'], html: 'Free', dataset: {price: 'Free'}}));
+	groupCost.appendChild(div({cls: ['filter', 'price'], html: 'Paid', dataset: {price: 'Paid'}}));
+	const groupAge = div({cls: 'group'});
+	formRow.appendChild(groupAge);
+	groupAge.appendChild(div({cls: ['filter', 'age'], html: '18+', dataset: {age: 18}}));
+	groupAge.appendChild(div({cls: ['filter', 'age'], html: '45+', dataset: {age: 45}}));
+	const groupVacx = div({cls: 'group'});
+	formRow.appendChild(groupVacx);
+	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covaxin', dataset: {name: 'COVAXIN'}}));
+	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covishield', dataset: {name: 'COVISHIELD'}}));
+	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Sputnik V', dataset: {name: 'SPUTNIK V'}}));
+	
+	const groupDose = div({cls: 'group'});
+	formRow.appendChild(groupDose);
+	groupDose.appendChild(div({cls: ['filter', 'dose'], html: 'Dose 1', dataset: {dose: 1}}));
+	groupDose.appendChild(div({cls: ['filter', 'dose'], html: 'Dose 2', dataset: {dose: 2}}));
 	for(let button of Array.from(formRow.querySelectorAll('.filter'))) {
 		button.addEventListener('click', (evt) => {
 			evt.target.classList.contains('selected')
@@ -191,7 +202,21 @@ const processInfoAfterQuery = async (query, ts) => {
 	if(query.filters.price.length) {
 		centers = centers.filter(c => query.filters.price.includes(c.fee_type));
 	}
+	// --- Dose Filters ---
+	if(query.filters.dose.length) {
+		for(let dose of query.filters.dose) {
+			centers = centers.filter(c => {
+				c.sessions = c.sessions.filter(s => s[`available_capacity_dose${dose}`] > 0);
+				if(c.sessions.length) {
+					return true;
+				} else {
+					return false;
+				}
+			})
+		}
+	}
 
+	// other data fields
 	data.totalShots = centers.length
 		? centers.map(c=>c.sessions).flat().map(s=>s.available_capacity).reduce((a,b)=>a+b)
 		: 0;
@@ -235,6 +260,8 @@ const submitButtonClickHandler = (evt) => {
 								.map(d => d.dataset.name);
 		query.filters.price = Array.from(dv.querySelectorAll('.filter.price.selected'))
 								.map(d => d.dataset.price);
+		query.filters.dose = Array.from(dv.querySelectorAll('.filter.dose.selected'))
+								.map(d => d.dataset.dose);
 		queries.push(query);
 	}
 	// let interval = document.querySelector('form input.interval').value;
