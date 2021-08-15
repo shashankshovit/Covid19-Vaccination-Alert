@@ -53,22 +53,22 @@ const addQueryTile = () => {
 	wrapper.appendChild(span({html: 'Pincode'}));
 	const groupCost = div({cls: 'group'});
 	formRow.appendChild(groupCost);
-	groupCost.appendChild(div({cls: ['filter', 'price'], html: 'Free', dataset: {price: 'Free'}}));
-	groupCost.appendChild(div({cls: ['filter', 'price'], html: 'Paid', dataset: {price: 'Paid'}}));
+	groupCost.appendChild(div({cls: ['filter', 'price', 'first'], html: 'Free', title: 'Free vaccine made available by central Govt', dataset: {price: 'Free'}}));
+	groupCost.appendChild(div({cls: ['filter', 'price', 'last'], html: 'Paid', title: 'Paid vaccine available at Pvt Hospital', dataset: {price: 'Paid'}}));
 	const groupAge = div({cls: 'group'});
 	formRow.appendChild(groupAge);
-	groupAge.appendChild(div({cls: ['filter', 'age'], html: '18+', dataset: {age: 18}}));
-	groupAge.appendChild(div({cls: ['filter', 'age'], html: '45+', dataset: {age: 45}}));
-	const groupVacx = div({cls: 'group'});
-	formRow.appendChild(groupVacx);
-	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covaxin', dataset: {name: 'COVAXIN'}}));
-	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covishield', dataset: {name: 'COVISHIELD'}}));
-	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Sputnik V', dataset: {name: 'SPUTNIK V'}}));
-	
+	groupAge.appendChild(div({cls: ['filter', 'age', 'first'], html: '18+', title: 'Mininum age 18', dataset: {age: 18}}));
+	groupAge.appendChild(div({cls: ['filter', 'age', 'last'], html: '45+', title: 'Mininum age 45', dataset: {age: 45}}));
 	const groupDose = div({cls: 'group'});
 	formRow.appendChild(groupDose);
-	groupDose.appendChild(div({cls: ['filter', 'dose'], html: 'Dose 1', dataset: {dose: 1}}));
-	groupDose.appendChild(div({cls: ['filter', 'dose'], html: 'Dose 2', dataset: {dose: 2}}));
+	groupDose.appendChild(div({cls: ['filter', 'dose', 'first'], html: 'D1', dataset: {dose: 1}, title: 'Dose 1'}));
+	groupDose.appendChild(div({cls: ['filter', 'dose', 'last'], html: 'D2', dataset: {dose: 2}, title: 'Dose 2'}));
+	const groupVacx = div({cls: 'group'});
+	formRow.appendChild(groupVacx);
+	groupVacx.appendChild(div({cls: ['filter', 'vaccine', 'first'], html: 'Covaxin', dataset: {name: 'COVAXIN'}}));
+	groupVacx.appendChild(div({cls: ['filter', 'vaccine'], html: 'Covishield', dataset: {name: 'COVISHIELD'}}));
+	groupVacx.appendChild(div({cls: ['filter', 'vaccine', 'last'], html: 'Sputnik V', dataset: {name: 'SPUTNIK V'}}));
+	
 	for(let button of Array.from(formRow.querySelectorAll('.filter'))) {
 		button.addEventListener('click', (evt) => {
 			evt.target.classList.contains('selected')
@@ -245,6 +245,10 @@ const fetchResults = async (queries, interval) => {
 
 const submitButtonClickHandler = (evt) => {
 	let queryDivs = Array.from(document.querySelectorAll('form .form-row.query'));
+	if(queryDivs.length < 1) {
+		alert('Please add atleast one row.');
+		return false;
+	}
 	let queries = [];
 	for(let dv of queryDivs) {
 		let query = {};
