@@ -155,7 +155,7 @@ const getTile = (ts, data, pincode) => {
 			let age_shot = div({cls: 'age-shot'});
 			miniTile.appendChild(age_shot);
 			age_shot.appendChild(div({cls: 'age', html: `${ss.min_age_limit}+`}))
-			age_shot.appendChild(div({cls: 'shot', html: `<strong>${ss.available_capacity}</strong>`}));
+			age_shot.appendChild(div({cls: 'shot', html: `<strong>${'queriedCapacity' in ss? ss.queriedCapacity: ss.available_capacity}</strong>`}));
 			sessionsDiv.appendChild(miniTile);
 		}
 		tile.appendChild(crow);
@@ -206,7 +206,14 @@ const processInfoAfterQuery = async (query, ts) => {
 	if(query.filters.dose.length) {
 		for(let dose of query.filters.dose) {
 			centers = centers.filter(c => {
-				c.sessions = c.sessions.filter(s => s[`available_capacity_dose${dose}`] > 0);
+				c.sessions = c.sessions.filter(s => {
+					if(query.filters.dose.length===1) {
+						s.queriedCapacity = s[`available_capacity_dose${dose}`];
+					} else {
+						s.queriedCapacity = s.available_capacity;
+					}
+					return 'queriedCapacity' in s ? s.queriedCapacity > 0 : s.available_capacity > 0;
+				});
 				if(c.sessions.length) {
 					return true;
 				} else {
@@ -220,15 +227,7 @@ const processInfoAfterQuery = async (query, ts) => {
 	data.totalShots = 0;
 	if(centers.length) {
 		data.totalShots = centers.map(c=>c.sessions).flat().map(s=>{
-			if(query.filters.dose.length==1) {
-				if(query.filters.dose[0]==='1') {
-					return s.available_capacity_dose1;
-				} else {	//	query.filters.dose[0]==='2'
-					return s.available_capacity_dose2;
-				}
-			} else {
-				return s.available_capacity;
-			}
+			return (('queriedCapacity' in s) ? s.queriedCapacity : s.available_capacity);
 		}).reduce((a,b)=>a+b);
 	}
 	data.centers = centers;
