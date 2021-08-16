@@ -216,10 +216,21 @@ const processInfoAfterQuery = async (query, ts) => {
 		}
 	}
 
-	// other data fields
-	data.totalShots = centers.length
-		? centers.map(c=>c.sessions).flat().map(s=>s.available_capacity).reduce((a,b)=>a+b)
-		: 0;
+	// other data fields: totalShots, centers
+	data.totalShots = 0;
+	if(centers.length) {
+		data.totalShots = centers.map(c=>c.sessions).flat().map(s=>{
+			if(query.filters.dose.length==1) {
+				if(query.filters.dose[0]==='1') {
+					return s.available_capacity_dose1;
+				} else {	//	query.filters.dose[0]==='2'
+					return s.available_capacity_dose2;
+				}
+			} else {
+				return s.available_capacity;
+			}
+		}).reduce((a,b)=>a+b);
+	}
 	data.centers = centers;
 
 	console.log(centers);
