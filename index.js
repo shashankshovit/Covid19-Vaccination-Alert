@@ -100,12 +100,12 @@ const displayDate = (date) => {
 	return `${date.getDate()} ${month[date.getMonth()]} | ${date.toLocaleTimeString()}`;
 }
 
-const afterFewMins = (mins, date) => {
-	if(!mins) throw Error('Mandatory few minutes.');
+const afterFewMins = (secs, date) => {
+	if(!secs) throw Error('Mandatory few minutes.');
 	if(!date || !(date instanceof Date)) {
 		date = new Date();
 	}
-	return displayDate(new Date(date.getTime() + mins*60*1000));
+	return displayDate(new Date(date.getTime() + secs*1000));
 }
 
 async function getCenters(pincode) {
@@ -279,15 +279,16 @@ const submitButtonClickHandler = (evt) => {
 		queries.push(query);
 	}
 	// let interval = document.querySelector('form input.interval').value;
-	let interval = 5;
-	if(!interval || interval<1) {
-		alert('Invalid Interval!');
-		return false;
-	}
+	let interval = parseInt(document.querySelector('form select').value);
+	// let interval = 5;
+	// if(!interval || interval<1) {
+	// 	alert('Invalid Interval!');
+	// 	return false;
+	// }
 	document.querySelector('body').removeChild(document.querySelector('.header'));
 	document.querySelector('.note .note-heading span').click();
 	fetchResults(queries, interval);
-	let myInterval = setInterval(()=>fetchResults(queries, interval), interval*60*1000);
+	let myInterval = setInterval(()=>fetchResults(queries, interval), interval*1000);
 }
 
 const noteCollapseClickHandler = (evt) => {
